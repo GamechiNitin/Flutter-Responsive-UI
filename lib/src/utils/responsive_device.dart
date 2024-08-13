@@ -18,7 +18,14 @@ import 'package:flutter/material.dart';
 
 
  */
-enum DeviceType { smallMobile, mobile, tablet, web, ios, mac, windows, linux }
+enum DeviceType {
+  smallMobile,
+  mobile,
+  tablet,
+  smallDesktop,
+  largeDesktop,
+  wideScreen,
+}
 
 const double smallMobileWidth = 480;
 const double mobileWidth = 481;
@@ -39,39 +46,64 @@ class BreakPoint {
   });
 }
 
-DeviceType deviceType(BuildContext context) {
-  var deviceType = DeviceType.web;
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
-  final orientation = MediaQuery.of(context).orientation;
+class DeviceInfo {
+  final BuildContext context;
+  DeviceInfo(this.context);
 
-  if ((orientation == Orientation.portrait && screenWidth >= webWidth) ||
-      (orientation == Orientation.landscape && screenHeight >= webWidth)) {
-    deviceType = DeviceType.web;
-  } else if ((orientation == Orientation.portrait &&
-          screenWidth <= smallMobileWidth) ||
-      (orientation == Orientation.landscape && screenHeight <= tabletWidth)) {
-    deviceType = DeviceType.smallMobile;
-  } else if ((orientation == Orientation.portrait &&
-          screenWidth <= tabletWidth) ||
-      (orientation == Orientation.landscape && screenHeight <= tabletWidth)) {
-    deviceType = DeviceType.mobile;
-  } else if ((orientation == Orientation.portrait &&
-          screenWidth >= tabletWidth) ||
-      (orientation == Orientation.landscape && screenHeight >= tabletWidth)) {
-    deviceType = DeviceType.tablet;
-  } else {
-    deviceType = DeviceType.mobile;
+  // Method to determine the device type
+  DeviceType get deviceType {
+    final size = MediaQuery.of(context).size;
+    // final aspectRatio = size.width / size.height;
+
+    if (size.width < 480) {
+      return DeviceType.smallMobile;
+    } else if (size.width >= 480 && size.width < 600) {
+      return DeviceType.mobile;
+    } else if (size.width >= 600 && size.width < 1024) {
+      return DeviceType.tablet;
+    } else if (size.width >= 1224 && size.width < 1600) {
+      return DeviceType.smallDesktop;
+    } else if (size.width >= 1600 && size.width < 1920) {
+      return DeviceType.largeDesktop;
+    } else {
+      return DeviceType.wideScreen;
+    }
   }
 
-  return deviceType;
-}
-
-class ResponsiveUiInit extends StatelessWidget {
-  const ResponsiveUiInit({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
+  // Method to get a descriptive string of the device type
+  String get deviceTypeDescription {
+    switch (deviceType) {
+      case DeviceType.smallMobile:
+        return 'Small Mobile';
+      case DeviceType.mobile:
+        return 'Mobile';
+      case DeviceType.tablet:
+        return 'Tablet';
+      case DeviceType.smallDesktop:
+        return 'Small Desktop';
+      case DeviceType.largeDesktop:
+        return 'Large Desktop';
+      case DeviceType.wideScreen:
+        return 'Wide Screen';
+      default:
+        return 'Unknown';
+    }
   }
+
+  // Getter for mobile devices
+  bool get isSmallMobile => deviceType == DeviceType.smallMobile;
+
+  bool get isMobile => deviceType == DeviceType.mobile;
+
+  // Getter for tablets
+  bool get isTablet => deviceType == DeviceType.tablet;
+
+  // Getter for small desktops
+  bool get isSmallDesktop => deviceType == DeviceType.smallDesktop;
+
+  // Getter for large desktops
+  bool get isLargeDesktop => deviceType == DeviceType.largeDesktop;
+
+  // Getter for wide screens
+  bool get isWideScreen => deviceType == DeviceType.wideScreen;
 }
