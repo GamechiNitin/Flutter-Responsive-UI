@@ -1,7 +1,29 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum DeviceType { mobile, tablet, web, ios, mac, windows, linux }
+/*
+    Mobile Phones
+    Small phones (portrait): 320px to 480px
+    Large phones (portrait): 481px to 767px
+    
+    Tablets
+    Portrait: 768px to 1024px
+    Landscape: 1024px to 1280px
+    
+    Web/Desktop
+    Small desktops: 1281px to 1440px
+    Large desktops: 1441px and above
+    TVs/Extra Large Screens
+
+    Extra large screens: 1920px and above
+
+
+ */
+enum DeviceType { smallMobile, mobile, tablet, web, ios, mac, windows, linux }
+
+const double smallMobileWidth = 480;
+const double mobileWidth = 481;
+const double tabletWidth = 600;
+const double webWidth = 1280;
 
 class BreakPoint {
   final bool isDefault;
@@ -23,29 +45,23 @@ DeviceType deviceType(BuildContext context) {
   final screenHeight = MediaQuery.of(context).size.height;
   final orientation = MediaQuery.of(context).orientation;
 
-  if (kIsWeb) {
+  if ((orientation == Orientation.portrait && screenWidth >= webWidth) ||
+      (orientation == Orientation.landscape && screenHeight >= webWidth)) {
     deviceType = DeviceType.web;
-  } else if (defaultTargetPlatform == TargetPlatform.android ||
-      defaultTargetPlatform == TargetPlatform.iOS) {
+  } else if ((orientation == Orientation.portrait &&
+          screenWidth <= smallMobileWidth) ||
+      (orientation == Orientation.landscape && screenHeight <= tabletWidth)) {
+    deviceType = DeviceType.smallMobile;
+  } else if ((orientation == Orientation.portrait &&
+          screenWidth <= tabletWidth) ||
+      (orientation == Orientation.landscape && screenHeight <= tabletWidth)) {
     deviceType = DeviceType.mobile;
-  } else if ((orientation == Orientation.portrait && screenWidth >= 600) ||
-      (orientation == Orientation.landscape && screenHeight >= 600)) {
+  } else if ((orientation == Orientation.portrait &&
+          screenWidth >= tabletWidth) ||
+      (orientation == Orientation.landscape && screenHeight >= tabletWidth)) {
     deviceType = DeviceType.tablet;
   } else {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.linux:
-        deviceType = DeviceType.linux;
-        break;
-      case TargetPlatform.macOS:
-        deviceType = DeviceType.mac;
-        break;
-      case TargetPlatform.windows:
-        deviceType = DeviceType.windows;
-        break;
-      default:
-        deviceType = DeviceType.mobile;
-        break;
-    }
+    deviceType = DeviceType.mobile;
   }
 
   return deviceType;
